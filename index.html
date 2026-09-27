@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zette's Creative Life ✨</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&family=Dancing+Script:wght@700&family=Plus+Jakarta+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #f3e7e9 0%, #e3eeff 50%, #e6e6fa 100%);
+      --card-bg: rgba(255, 255, 255, 0.65);
+      --card-border: rgba(255, 255, 255, 0.8);
+      --accent-primary: #fd79a8;
+      --accent-secondary: #a29bfe;
+      --accent-blue: #74b9ff;
+      --text-main: #2d3436;
+      --text-sub: #636e72;
+      --3d-color-1: 0xa29bfe;
+      --3d-color-2: 0xfd79a8;
+      --3d-color-3: 0x74b9ff;
+      --font-script: 'Dancing Script', cursive;
+      --font-rounded: 'Comfortaa', cursive;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body.theme-sakura {
+      --bg-gradient: linear-gradient(135deg, #ffe5ec 0%, #ffc2d1 50%, #ffe5ec 100%);
+      --card-bg: rgba(255, 255, 255, 0.7);
+      --card-border: rgba(255, 182, 193, 0.8);
+      --accent-primary: #ff4d6d;
+      --accent-secondary: #ff758f;
+      --accent-blue: #ffb3c1;
+      --text-main: #4a0e17;
+      --text-sub: #802334;
+      --3d-color-1: 0xff4d6d;
+      --3d-color-2: 0xff758f;
+      --3d-color-3: 0xffb3c1;
+    }
+
+    body.theme-mint {
+      --bg-gradient: linear-gradient(135deg, #e8f8f5 0%, #d1f2eb 50%, #a3e4d7 100%);
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(163, 228, 215, 0.8);
+      --accent-primary: #16a085;
+      --accent-secondary: #48c9b0;
+      --accent-blue: #76d7c4;
+      --text-main: #0e4b3e;
+      --text-sub: #196f5d;
+      --3d-color-1: 0x16a085;
+      --3d-color-2: 0x48c9b0;
+      --3d-color-3: 0x76d7c4;
+    }
+
+    body.theme-sunset {
+      --bg-gradient: linear-gradient(135deg, #ffedd8 0%, #fce1e4 50%, #fcf4dd 100%);
+      --card-bg: rgba(255, 255, 255, 0.75);
+      --card-border: rgba(255, 200, 180, 0.8);
+      --accent-primary: #e056fd;
+      --accent-secondary: #ff7675;
+      --accent-blue: #fdcb6e;
+      --text-main: #3d1c02;
+      --text-sub: #7a431d;
+      --3d-color-1: 0xe056fd;
+      --3d-color-2: 0xff7675;
+      --3d-color-3: 0xfdcb6e;
+    }
+
+    body.theme-midnight {
+      --bg-gradient: linear-gradient(135deg, #130f40 0%, #000000 50%, #190a28 100%);
+      --card-bg: rgba(25, 20, 35, 0.75);
+      --card-border: rgba(162, 155, 254, 0.3);
+      --accent-primary: #ff85a2;
+      --accent-secondary: #a29bfe;
+      --accent-blue: #81ecec;
+      --text-main: #f5f6fa;
+      --text-sub: #dcdde1;
+      --3d-color-1: 0xa29bfe;
+      --3d-color-2: 0xff85a2;
+      --3d-color-3: 0x81ecec;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 15px;
+      overflow-x: hidden;
+    }
+
+    #canvas-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 650px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .interactive {
+      pointer-events: auto;
+    }
+
+    .top-actions {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .action-btn {
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 30px;
+      padding: 8px 14px;
+      font-family: var(--font-rounded);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+
+    header {
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 30px;
+      padding: 35px 20px;
+      text-align: center;
+      margin-top: 45px;
+      margin-bottom: 25px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+      animation: gentleFloat 5s ease-in-out infinite;
+    }
+
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-7px); }
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 135px;
+      height: 135px;
+      margin: 0 auto 15px auto;
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--accent-secondary);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .photo-upload-trigger {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .file-input-hidden {
+      display: none;
+    }
+
+    .script-header {
+      font-family: var(--font-script);
+      font-size: 3.2rem;
+      color: var(--accent-primary);
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    h1 {
+      font-family: var(--font-rounded);
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 10px;
+    }
+
+    .status-pill {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent-secondary), var(--accent-blue));
+      color: white;
+      padding: 6px 18px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .tab-bar {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab-link {
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--text-sub);
+      padding: 10px 16px;
+      border-radius: 18px;
+      font-family: var(--font-rounded);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab-link.active {
+      background: var(--accent-primary);
+      color: white;
+      border-color: var(--accent-primary);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+
+    .card-panel {
+      display: none;
+      background: var(--card-bg);
+      border: 1.5px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 25px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    }
+
+    .card-panel.active {
+      display: block;
+      animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    h2 {
+      font-family: var(--font-rounded);
+      color: var(--accent-primary);
+      font-size: 1.35rem;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .hobby-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .hobby-card {
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid var(--card-border);
+      padding: 15px 10px;
+      border-radius: 18px;
+      text-align: center;
+      font-family: var(--font-rounded);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .drama-banner-box {
+      position: relative;
+      width: 100%;
+      height: 210px;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 15px;
+    }
+
+    .drama-cover {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      border-radius: 25px;
+      padding: 22px;
+      width: 90%;
+      max-width: 480px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 15px 0;
+    }
+
+    .palette-option {
+      background: rgba(255,255,255,0.7);
+      border: 2px solid var(--card-border);
+      padding: 12px;
+      border-radius: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-rounded);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .sketch-toolbar {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .color-picker-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+    }
+
+    .sketch-canvas {
+      width: 100%;
+      height: 280px;
+      background: white;
+      border-radius: 15px;
+      border: 1px solid #ccc;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 35px;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      font-family: var(--font-rounded);
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <div class="top-actions interactive">
+    <button class="action-btn" onclick="openThemeModal()">🎨 Theme Colors</button>
+    <button class="action-btn" onclick="openSketchModal()">✏️ Draw / Note</button>
+  </div>
+
+  <div class="wrapper">
+    <header class="interactive">
+      <div class="avatar-wrapper">
+        <img id="profile-pic" class="avatar-img" src="portrait.jpg" alt="Zette Vera Cruz" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80';">
+        <button class="photo-upload-trigger" onclick="document.getElementById('avatar-input').click()">📷</button>
+        <input type="file" id="avatar-input" class="file-input-hidden" accept="image/*" onchange="updateImage(event, 'profile-pic')">
+      </div>
+
+      <div class="script-header">Welcome to Zette's Life</div>
+      <h1>Zette Vera Cruz</h1>
+      <span class="status-pill">📝 Notepad HTML Learner</span>
+    </header>
+
+    <div class="tab-bar interactive">
+      <button class="tab-link active" onclick="openTab(event, 'about')">About</button>
+      <button class="tab-link" onclick="openTab(event, 'hobbies')">Hobbies</button>
+      <button class="tab-link" onclick="openTab(event, 'kdrama')">Fav Drama</button>
+    </div>
+
+    <div id="about" class="card-panel active interactive">
+      <h2>About Me</h2>
+      <p>Hello and welcome! 👋</p>
+      <p style="margin-top: 10px; line-height: 1.7;">I am a <strong>Senior High School student</strong> who is currently learning how to build web pages using HTML in Notepad. Whenever I take a break from school and coding, I love relaxing and watching my favorite K-dramas!</p>
+    </div>
+
+    <div id="hobbies" class="card-panel interactive">
+      <h2>My Hobbies</h2>
+      <div class="hobby-grid">
+        <div class="hobby-card">🎬 Watching K-dramas</div>
+        <div class="hobby-card">🎧 Listening to Music</div>
+        <div class="hobby-card">🎸 Playing Guitar</div>
+        <div class="hobby-card">👭 Spending time with Friends</div>
+      </div>
+    </div>
+
+    <div id="kdrama" class="card-panel interactive">
+      <h2>My Favorite K-Drama</h2>
+      <div class="drama-banner-box">
+        <img id="drama-pic" class="drama-cover" src="portrait.jpg" alt="Twinkling Watermelon" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80';">
+        <button class="photo-upload-trigger" onclick="document.getElementById('drama-input').click()">📷</button>
+        <input type="file" id="drama-input" class="file-input-hidden" accept="image/*" onchange="updateImage(event, 'drama-pic')">
+      </div>
+      <h3 style="color: var(--accent-primary); font-family: var(--font-rounded); margin-bottom: 8px;">🍉 Twinkling Watermelon</h3>
+      <p style="line-height: 1.7;">One of my favorite K-dramas is <strong>Twinkling Watermelon</strong>. I love watching it because of its sweet storyline, relatable characters, and emotional moments that touch your heart!</p>
+    </div>
+
+    <footer>
+      <p>Crafted with 💕 by Zette Vera Cruz</p>
+    </footer>
+  </div>
+
+  <div id="themeModal" class="modal-overlay">
+    <div class="modal-card">
+      <h2>🎨 Pick a Theme Color</h2>
+      <div class="palette-grid">
+        <div class="palette-option" onclick="applyTheme('default')">
+          <span class="dot" style="background:#a29bfe;"></span> Lavender Dream
+        </div>
+        <div class="palette-option" onclick="applyTheme('sakura')">
+          <span class="dot" style="background:#ff4d6d;"></span> Soft Sakura
+        </div>
+        <div class="palette-option" onclick="applyTheme('mint')">
+          <span class="dot" style="background:#16a085;"></span> Mint Fresh
+        </div>
+        <div class="palette-option" onclick="applyTheme('sunset')">
+          <span class="dot" style="background:#ff7675;"></span> Sunset Glow
+        </div>
+      </div>
+      <button class="action-btn" style="width:100%; margin-top:5px;" onclick="applyTheme('midnight')">🌙 Midnight Dark Mode</button>
+      <button class="action-btn" style="margin-top:15px;" onclick="closeThemeModal()">Close</button>
+    </div>
+  </div>
+
+  <div id="sketchModal" class="modal-overlay">
+    <div class="modal-card">
+      <h2 style="margin-bottom: 10px;">✏️ Doodle / Idea Pad</h2>
+      <div class="sketch-toolbar">
+        <button class="color-picker-btn" style="background:#fd79a8;" onclick="setPenColor('#fd79a8')"></button>
+        <button class="color-picker-btn" style="background:#a29bfe;" onclick="setPenColor('#a29bfe')"></button>
+        <button class="color-picker-btn" style="background:#16a085;" onclick="setPenColor('#16a085')"></button>
+        <button class="color-picker-btn" style="background:#000000;" onclick="setPenColor('#000000')"></button>
+        <button class="action-btn" onclick="clearCanvas()">🧹 Clear</button>
+        <button class="action-btn" onclick="closeSketchModal()">❌ Close</button>
+      </div>
+      <canvas id="doodleCanvas" class="sketch-canvas"></canvas>
+    </div>
+  </div>
+
+  <script>
+    function openTab(evt, tabId) {
+      document.querySelectorAll('.card-panel').forEach(card => card.classList.remove('active'));
+      document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+
+    const themeModal = document.getElementById('themeModal');
+
+    function openThemeModal() {
+      themeModal.classList.add('open');
+    }
+
+    function closeThemeModal() {
+      themeModal.classList.remove('open');
+    }
+
+    function applyTheme(themeName) {
+      document.body.className = '';
+      if (themeName !== 'default') {
+        document.body.classList.add('theme-' + themeName);
+      }
+      closeThemeModal();
+      update3DColors();
+    }
+
+    function updateImage(event, elementId) {
+      const reader = new FileReader();
+      reader.onload = function() {
+        document.getElementById(elementId).src = reader.result;
+      };
+      if (event.target.files[0]) {
+        reader.readAsDataURL(event.target.files[0]);
+      }
+    }
+
+    const sketchModal = document.getElementById('sketchModal');
+    const canvas = document.getElementById('doodleCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    let penColor = '#fd79a8';
+
+    function openSketchModal() {
+      sketchModal.classList.add('open');
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = penColor;
+    }
+
+    function closeSketchModal() {
+      sketchModal.classList.remove('open');
+    }
+
+    function setPenColor(color) {
+      penColor = color;
+      ctx.strokeStyle = color;
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function startDraw(e) {
+      drawing = true;
+      ctx.beginPath();
+      const pos = getPos(e);
+      ctx.moveTo(pos.x, pos.y);
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+      const pos = getPos(e);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    }
+
+    function stopDraw() {
+      drawing = false;
+    }
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('mouseleave', stopDraw);
+
+    canvas.addEventListener('touchstart', startDraw, { passive: true });
+    canvas.addEventListener('touchmove', draw, { passive: true });
+    canvas.addEventListener('touchend', stopDraw);
+    canvas.addEventListener('touchcancel', stopDraw);
+
+    let scene, camera, renderer;
+    let shapesGroup;
+    let floatShapes = [];
+    let mouseX = 0, mouseY = 0;
+
+    function init3D() {
+      const container = document.getElementById('canvas-container');
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 14;
+
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+
+      shapesGroup = new THREE.Group();
+      scene.add(shapesGroup);
+
+      const geometryTypes = [
+        new THREE.TetrahedronGeometry(1.5, 0),
+        new THREE.OctahedronGeometry(1.35, 0),
+        new THREE.IcosahedronGeometry(1.5, 1),
+        new THREE.DodecahedronGeometry(1.2, 0)
+      ];
+
+      const materialColors = [0xa29bfe, 0xfd79a8, 0x74b9ff];
+
+      for (let i = 0; i < 18; i++) {
+        const geometry = geometryTypes[i % geometryTypes.length].clone();
+        const material = new THREE.MeshStandardMaterial({
+          color: materialColors[i % materialColors.length],
+          emissive: materialColors[i % materialColors.length],
+          emissiveIntensity: 0.25,
+          roughness: 0.4,
+          metalness: 0.4
+        });
+
+        const mesh = new THREE.Mesh(geometry, material);
+
+        const radius = 4 + Math.random() * 4.5;
+        const angle = (i / 18) * Math.PI * 2;
+        const y = (Math.random() - 0.5) * 7;
+
+        mesh.position.set(
+          Math.cos(angle) * radius,
+          y,
+          Math.sin(angle) * radius
+        );
+
+        mesh.rotation.set(
+          Math.random() * Math.PI,
+          Math.random() * Math.PI,
+          Math.random() * Math.PI
+        );
+
+        mesh.userData = {
+          speed: 0.003 + Math.random() * 0.008,
+          offset: Math.random() * Math.PI * 2
+        };
+
+        shapesGroup.add(mesh);
+        floatShapes.push(mesh);
+      }
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 1.1);
+      scene.add(ambientLight);
+
+      const pointLight = new THREE.PointLight(0xffffff, 1.8, 50);
+      pointLight.position.set(5, 6, 10);
+      scene.add(pointLight);
+
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('resize', onResize);
+
+      update3DColors();
+      animate();
+    }
+
+    function update3DColors() {
+      if (!floatShapes || floatShapes.length === 0) return;
+
+      const styles = getComputedStyle(document.body);
+      const color1 = new THREE.Color(styles.getPropertyValue('--3d-color-1').trim());
+      const color2 = new THREE.Color(styles.getPropertyValue('--3d-color-2').trim());
+      const color3 = new THREE.Color(styles.getPropertyValue('--3d-color-3').trim());
+
+      floatShapes.forEach((mesh, index) => {
+        const colorSet = [color1, color2, color3];
+        const chosen = colorSet[index % colorSet.length];
+        mesh.material.color.set(chosen);
+        mesh.material.emissive.set(chosen);
+      });
+    }
+
+    function onPointerMove(event) {
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      shapesGroup.rotation.y += 0.0025;
+      shapesGroup.rotation.x = mouseY * 0.5;
+      shapesGroup.rotation.z = mouseX * 0.5;
+
+      floatShapes.forEach((mesh, index) => {
+        mesh.rotation.x += mesh.userData.speed * (index % 2 === 0 ? 1 : -1);
+        mesh.rotation.y += mesh.userData.speed * (index % 3 === 0 ? 1 : -1);
+        mesh.position.y += Math.sin((performance.now() * 0.001) + mesh.userData.offset) * 0.004;
+      });
+
+      renderer.render(scene, camera);
+    }
+
+    init3D();
+  </script>
+</body>
+</html>
